@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "Hello, from Flask in Wasmer Edge 🚀"
+    return "Challenge 07: applicazione aggiornata!"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
