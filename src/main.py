@@ -1,6 +1,8 @@
 import os
 import ssl
 
+os.environ.setdefault("USER", "wasmer")
+
 import pymysql
 from flask import Flask, jsonify
 
