@@ -4,7 +4,7 @@ import ssl
 os.environ.setdefault("USER", "wasmer")
 
 import pymysql
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
@@ -48,6 +48,38 @@ def list_notes():
             note["created_at"] = note["created_at"].isoformat()
 
         return jsonify(notes)
+    finally:
+        connection.close()
+
+@app.post("/api/notes")
+def create_note():
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invia un oggetto JSON"}), 400
+
+    content = data.get("content")
+
+    if not isinstance(content, str) or not content.strip():
+        return jsonify({"error": "Il testo non può essere vuoto"}), 400
+
+    content = content.strip()
+    connection = connect_db()
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO notes (content) VALUES (%s)",
+                (content,),
+            )
+            note_id = cursor.lastrowid
+
+        connection.commit()
+
+        return jsonify({
+            "id": note_id,
+            "content": content,
+        }), 201
     finally:
         connection.close()
 
